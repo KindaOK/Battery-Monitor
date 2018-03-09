@@ -85,7 +85,7 @@ Exit:
 	return
 	
 About:
-	Run, chrome.exe README.md
+	Run, notepad.exe README.md
 	return
 	
 ScriptReload:
