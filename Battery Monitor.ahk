@@ -19,6 +19,8 @@ global pollingInterval := ""
 global suppressWarning := ""
 global warningSound := ""
 global runOnStartup := ""
+global userName := ""
+global batteryTimeLeft := ""
 
 SetTimer, CheckBatState, %pollingInterval%
 goto, CheckIni
@@ -38,21 +40,23 @@ ReadInteger( p_address, p_offset, p_size, p_hex=true )
 }
 
 CheckIni:
-IniRead, triggerPercentage, IndicatorConfig.ini, settings, triggerPercentage
-IniRead, pollingInterval, IndicatorConfig.ini, settings, pollingInterval
-IniRead, suppressWarning, IndicatorConfig.ini, settings, supressWarningTime
-IniRead, warningSound, IndicatorConfig.ini, settings, warningSound
-IniRead, runOnStartup, IndicatorConfig.ini, settings, runOnStartup
-if (runOnStartup = 1)
-{
-	if !FileExist("%A_Startup%\Battery Monitor.lnk")
+	IniRead, triggerPercentage, IndicatorConfig.ini, settings, triggerPercentage
+	IniRead, pollingInterval, IndicatorConfig.ini, settings, pollingInterval
+	IniRead, suppressWarning, IndicatorConfig.ini, settings, supressWarningTime
+	IniRead, warningSound, IndicatorConfig.ini, settings, warningSound
+	IniRead, runOnStartup, IndicatorConfig.ini, settings, runOnStartup
+	IniRead, userName, IndicatorConfig.ini, settings, userName
+
+	if (runOnStartup = 1)
 	{
-		FileCreateShortcut, %A_ScriptFullPath%, %A_Startup%\Battery Monitor.lnk, %A_ScriptDir%
+		if !FileExist("%A_Startup%\Battery Monitor.lnk")
+		{
+			FileCreateShortcut, %A_ScriptFullPath%, %A_Startup%\Battery Monitor.lnk, %A_ScriptDir%
+		}
+	} else {
+		FileDelete, %A_Startup%\Battery Monitor.lnk
 	}
-} else {
-	FileDelete, %A_Startup%\Battery Monitor.lnk
-}
-return
+	return
 
 
 CheckBatState:
@@ -64,13 +68,32 @@ CheckBatState:
 	batteryLifePercent:=ReadInteger(&powerstatus,2,1,false)
 	batteryLifeTime:=ReadInteger(&powerstatus,4,4,false)
 	batteryFullLifeTime:=ReadInteger(&powerstatus,8,4,false)
+	
+	h := batteryLifeTime
+	m := batteryLifeTime
+	batteryTimeLeft := ""
+	if (batteryLifeTime < 3600)
+	{
+		m//=60
+		batteryTimeLeft = %m% minutes
+	} else {
+		h//=3600
+		m//=60
+		m:=Mod(m,60)
+		if (h = 1)
+		{
+			batteryTimeLeft = %h% hour and %m% minutes
+		}
+		batteryTimeLeft = %h% hours and %m% minutes
+	}
+	
 	if (batteryLifePercent <= triggerPercentage and acLineStatus != 1)
 	{
 		if (warningSound = 1)
 		{
 			SoundPlay, *48
 		}
-		MsgBox, 4, Battery Warning, You have %batteryLifePercent% percent battery remaining. Get your charger %A_ComputerName%. If you would like to stop temporarily this warning , press "No". Otherwise, press "Yes".
+		MsgBox, 4, Battery Warning, You have %batteryLifePercent% percent battery remaining with an estimated lifetime of %batteryTimeLeft%. Get your charger %userName%. If you would like to temporarily stop this warning, press "No". Otherwise, press "Yes".
 		IfMsgBox No
 			Sleep, %suppressWarning%
 	}
