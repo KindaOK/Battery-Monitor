@@ -1,4 +1,4 @@
-# Battery Monitor v1.3
+# Battery Monitor v1.4
 
 Made by Necromancer5385 as a solution for school Surface laptops failing to display a low battery indicator. Settings regarding basic functionality can be modified in the included config file.
 
@@ -9,6 +9,8 @@ Thanks to [David Deley](http://members.cox.net/deleyd/) for making his work on a
 -------------
 
 ### Changelog:
+
+v1.4 Added the time remaining to the tray icon and cleaned up some code. (Completed 3/22/18, Compiled 6/19/18)
 
 v1.3 Added in the option to change the name of the user and added the time remaining to the message box. Minor tweaks to other parts. (3/12/18)
 
