@@ -48,10 +48,8 @@ CheckIni:
 	IniRead, runOnStartup, IndicatorConfig.ini, settings, runOnStartup
 	IniRead, userName, IndicatorConfig.ini, settings, userName
 
-	if (runOnStartup = 1)
-	{
-		if !FileExist("%A_Startup%\Battery Monitor.lnk")
-		{
+	if (runOnStartup = 1) {
+		if !FileExist("%A_Startup%\Battery Monitor.lnk") {
 			FileCreateShortcut, %A_ScriptFullPath%, %A_Startup%\Battery Monitor.lnk, %A_ScriptDir%
 		}
 	} else {
@@ -73,25 +71,24 @@ CheckBatState:
 	h := batteryLifeTime
 	m := batteryLifeTime
 	batteryTimeLeft := ""
-	if (batteryLifeTime < 3600)
-	{
-		m//=60
-		batteryTimeLeft = %m% minutes
+	if (acLineStatus == 1) {
+		batteryTimeLeft = Charging
 	} else {
-		h//=3600
-		m//=60
-		m:=Mod(m,60)
-		if (h = 1)
-		{
-			batteryTimeLeft = %h% hour and %m% minutes
+		if (batteryLifeTime < 3600) {
+			m//=60
+			batteryTimeLeft = %m% minutes
+		} else {
+			h//=3600
+			m//=60
+			m:=Mod(m,60)
+			if (h = 1) {
+				batteryTimeLeft = %h% hour and %m% minutes
+			}
+			batteryTimeLeft = %h% hours and %m% minutes
 		}
-		batteryTimeLeft = %h% hours and %m% minutes
 	}
-	
-	if (batteryLifePercent <= triggerPercentage and acLineStatus != 1)
-	{
-		if (warningSound = 1)
-		{
+	if (batteryLifePercent <= triggerPercentage and acLineStatus != 1) {
+		if (warningSound = 1) {
 			SoundPlay, *48
 		}
 		MsgBox, 4, Battery Warning, You have %batteryLifePercent% percent battery remaining with an estimated lifetime of %batteryTimeLeft%. Get your charger %userName%. If you would like to temporarily stop this warning, press "No". Otherwise, press "Yes".
